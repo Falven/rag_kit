@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "rag-utils"
+version = "0.0.1"
+description = "Common utilities for python RAG projects."
+authors = ["Fran Aguilera <falven2000@hotmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.13"
+unstructured = "^0.14.6"
+llama-index-core = "^0.10.45"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
