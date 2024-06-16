@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "rag-utils"
+name = "rag-kit"
 version = "0.0.1"
 description = "Common utilities for python RAG projects."
 authors = ["Fran Aguilera <falven2000@hotmail.com>"]
