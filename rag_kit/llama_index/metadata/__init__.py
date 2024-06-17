@@ -1,3 +1,3 @@
-from rag_kit.llama_index.metadata.meta_expr_engine import MetaExprEngine
+from rag_kit.llama_index.metadata.meta_expr_engine import parse_expression
 
-__all__ = ["MetaExprEngine"]
+__all__ = ["parse_expression"]
