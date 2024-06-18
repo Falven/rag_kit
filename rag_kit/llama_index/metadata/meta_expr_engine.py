@@ -32,6 +32,7 @@ Example of a supported expression:
 """
 
 import ast
+from math import exp
 from typing import List
 
 from llama_index.core.vector_stores import (
@@ -70,6 +71,10 @@ class MetaExprVisitor(ast.NodeVisitor):
 
 def parse_expression(expression: str) -> List[MetadataFilters]:
     """Parse an expression string into a list of MetadataFilters."""
+
+    if not expression:
+        return []
+
     tree = ast.parse(expression, mode="eval")
 
     visitor = MetaExprVisitor()
