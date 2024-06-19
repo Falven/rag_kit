@@ -143,18 +143,21 @@ class TopologicalTaskRunner:
     async def _execute_task(
         self, name: str, func: Callable[..., Any], *args: Any, **kwargs: Any
     ) -> Any:
-        start_time = time()
-        self.logger.info(f"Executing {name}")
-        result = await (
-            func(*args, **kwargs)
-            if asyncio.iscoroutinefunction(func)
-            else asyncio.to_thread(func, *args, **kwargs)
-        )
-        elapsed_time = time() - start_time
-        elapsed_time_ms = elapsed_time * 1000
-        self.logger.info(
-            f"Executed {name} in {elapsed_time:.2f}s ({elapsed_time_ms:.0f}ms)"
-        )
+        try:
+            start_time = time()
+            self.logger.info(f"Executing {name}")
+            result = await (
+                func(*args, **kwargs)
+                if asyncio.iscoroutinefunction(func)
+                else asyncio.to_thread(func, *args, **kwargs)
+            )
+            elapsed_time = time() - start_time
+            elapsed_time_ms = elapsed_time * 1000
+            self.logger.info(
+                f"Executed {name} in {elapsed_time:.2f}s ({elapsed_time_ms:.0f}ms)"
+            )
+        except BaseException as be:
+            self.logger.exception(f"Error executing task {name}: {be}")
         return result
 
     def _calculate_ready_tasks(
