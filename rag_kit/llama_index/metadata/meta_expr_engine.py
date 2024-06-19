@@ -69,22 +69,33 @@ class MetaExprVisitor(ast.NodeVisitor):
         self.conditions.append(type(node.op).__name__)
 
 
-def parse_expression(expression: str) -> List[MetadataFilters]:
-    """Parse an expression string into a list of MetadataFilters."""
+def parse_expression(expression: str) -> MetadataFilters:
+    """Parse an expression string into a MetadataFilters object."""
 
     if not expression:
-        return []
+        return MetadataFilters(filters=[])
 
     tree = ast.parse(expression, mode="eval")
 
     visitor = MetaExprVisitor()
     visitor.visit(tree)
 
-    metadata_filters_list = []
+    return _build_metadata_filters(visitor.comparisons, visitor.conditions)
+
+
+def _build_metadata_filters(
+    comparisons: List[dict], conditions: List[str]
+) -> MetadataFilters:
+    """Build a MetadataFilters object from comparisons and conditions."""
+
+    if not comparisons:
+        return MetadataFilters(filters=[])
+
     current_metadata_filters = MetadataFilters(filters=[])
     last_condition = None
+    nested_filters = []
 
-    for i, comparison in enumerate(visitor.comparisons):
+    for i, comparison in enumerate(comparisons):
         key = comparison["key"]
         value = comparison["value"]
         operator = _map_operator(comparison["operator"])
@@ -97,10 +108,10 @@ def parse_expression(expression: str) -> List[MetadataFilters]:
             )
         )
 
-        if i < len(visitor.conditions):
-            condition = _map_condition(visitor.conditions[i])
+        if i < len(conditions):
+            condition = _map_condition(conditions[i])
             if last_condition and last_condition != condition:
-                metadata_filters_list.append(current_metadata_filters)
+                nested_filters.append(current_metadata_filters)
                 current_metadata_filters = MetadataFilters(
                     filters=[], condition=condition
                 )
@@ -109,9 +120,12 @@ def parse_expression(expression: str) -> List[MetadataFilters]:
             last_condition = condition
 
     if current_metadata_filters.filters:
-        metadata_filters_list.append(current_metadata_filters)
+        nested_filters.append(current_metadata_filters)
 
-    return metadata_filters_list
+    if len(nested_filters) == 1:
+        return nested_filters[0]
+
+    return MetadataFilters(filters=nested_filters)
 
 
 def _map_operator(operator: type) -> FilterOperator:
