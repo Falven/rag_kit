@@ -81,7 +81,7 @@ def parse_expression(expression: str) -> List[MetadataFilters]:
     visitor.visit(tree)
 
     metadata_filters_list = []
-    current_metadata_filters = MetadataFilters(filters=[], condition=None)
+    current_metadata_filters = MetadataFilters(filters=[])
     last_condition = None
 
     for i, comparison in enumerate(visitor.comparisons):
