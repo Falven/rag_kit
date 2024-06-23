@@ -16,23 +16,26 @@ def to_documents(
         if not hasattr(node, "metadata"):
             continue
 
+        fields_to_skip = [
+            "_known_field_names",  # does not serialize
+            "DEBUG_FIELD_NAMES",  # does not serialize
+            "coordinates",  # does not serialize
+            "parent_id",  # might cause interference
+            "orig_elements",  # does not serialize
+        ]
         metadata = {}
         for field, val in vars(node.metadata).items():
-            if field == "_known_field_names":
-                continue
-            # removing coordinates because it does not serialize
-            # and dont want to bother with it
-            if field == "coordinates":
-                continue
-            # removing bc it might cause interference
-            if field == "parent_id":
+            if field in fields_to_skip:
                 continue
 
-            metadata[field] = (
-                json.dumps(val)
-                if not isinstance(val, (str, int, float, type(None)))
-                else val
-            )
+            try:
+                metadata[field] = (
+                    json.dumps(val)
+                    if not isinstance(val, (str, int, float, type(None)))
+                    else val
+                )
+            except (TypeError, OverflowError):
+                continue
 
         if extra_info is not None:
             metadata.update(extra_info)
@@ -45,7 +48,7 @@ def to_documents(
         }
 
         if deterministic_ids:
-            doc_kwargs["id_"] = f"{filename!s}_part_{i}"
+            doc_kwargs["doc_id"] = f"{filename!s}_part_{i}"
 
         docs.append(Document(**doc_kwargs))
 
