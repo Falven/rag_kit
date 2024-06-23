@@ -18,7 +18,6 @@ class EnhancedElement(Element):
             EnhancedElement: The new EnhancedElement instance.
         """
         return cls(
-            text=element.text,
             element_id=element._element_id,
             coordinates=(
                 element.metadata.coordinates.points
