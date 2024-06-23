@@ -6,6 +6,34 @@ from unstructured.documents.elements import Element
 
 
 class EnhancedElement(Element):
+    @classmethod
+    def from_element(cls, element: Element) -> "EnhancedElement":
+        """
+        Create an EnhancedElement from an existing Element.
+
+        Args:
+            element: The Element instance to convert.
+
+        Returns:
+            EnhancedElement: The new EnhancedElement instance.
+        """
+        return cls(
+            text=element.text,
+            element_id=element._element_id,
+            coordinates=(
+                element.metadata.coordinates.points
+                if element.metadata.coordinates
+                else None
+            ),
+            coordinate_system=(
+                element.metadata.coordinates.system
+                if element.metadata.coordinates
+                else None
+            ),
+            metadata=element.metadata,
+            detection_origin=element.metadata.detection_origin,
+        )
+
     def to_document(
         self,
         sequence_number: Optional[int] = None,
