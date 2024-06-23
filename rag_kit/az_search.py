@@ -1,7 +1,7 @@
 import re
 
 
-def sanitize_azure_search_index_name(input_string):
+def sanitize_azure_search_index_name(input_string: str) -> str:
     """
     Sanitizes a given string to a valid Azure Search index name.
 
