@@ -1,4 +1,3 @@
-import json
 from typing import Optional
 
 from llama_index.core import Document
@@ -56,36 +55,12 @@ class EnhancedElement(Element):
                 "If deterministic_ids is True, sequence_number must be provided."
             )
 
-        fields_to_skip = [
-            "_known_field_names",  # does not serialize
-            "DEBUG_FIELD_NAMES",  # does not serialize
-            "coordinates",  # does not serialize
-            "parent_id",  # might cause interference
-            "orig_elements",  # does not serialize
-        ]
-        transient_fields = (str, int, float, type(None))
-        metadata = {}
-        if self.metadata:
-            for field, val in vars(self.metadata).items():
-                if field in fields_to_skip:
-                    continue
+        doc_kwargs = {"text": self.text}
 
-                try:
-                    metadata[field] = (
-                        json.dumps(val)
-                        if not isinstance(val, transient_fields)
-                        else val
-                    )
-                except (TypeError, OverflowError):
-                    continue
-
-            if extra_info is not None:
-                metadata.update(extra_info)
-
-        doc_kwargs = {
-            "text": self.text,
-            "extra_info": metadata,
-        }
+        metadata = self.metadata.to_dict()
+        if extra_info:
+            metadata.update(extra_info)
+        doc_kwargs["extra_info"] = metadata
 
         if deterministic_ids:
             doc_kwargs["doc_id"] = self.id_to_hash(sequence_number)
