@@ -1,8 +1,19 @@
 import json
+import re
 from typing import Dict, List, Optional
 
 from llama_index.core import Document
 from unstructured.documents.elements import Element
+
+DOC_ID_SANITIZE_PATTERN = re.compile(r"[^a-zA-Z0-9_\-=]")
+
+
+def sanitize_doc_id(doc_id: str) -> str:
+    """
+    Sanitize the doc_id to ensure it only contains allowed characters.
+    Allowed characters: letters, digits, underscore (_), dash (-), or equal sign (=).
+    """
+    return DOC_ID_SANITIZE_PATTERN.sub("_", doc_id)
 
 
 def to_documents(
@@ -48,7 +59,7 @@ def to_documents(
         }
 
         if deterministic_ids:
-            doc_kwargs["doc_id"] = f"{filename!s}_part_{i}"
+            doc_kwargs["doc_id"] = sanitize_doc_id(f"{filename}_part_{i}")
 
         docs.append(Document(**doc_kwargs))
 
