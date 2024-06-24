@@ -5,33 +5,15 @@ from llama_index.core import Document
 from unstructured.documents.elements import Element
 
 
-class EnhancedElement(Element):
-    @classmethod
-    def from_element(cls, element: Element) -> "EnhancedElement":
-        """
-        Create an EnhancedElement from an existing Element.
+class ElementComposer:
+    def __init__(self, element: Element):
+        self._element = element
 
-        Args:
-            element: The Element instance to convert.
-
-        Returns:
-            EnhancedElement: The new EnhancedElement instance.
+    def __getattr__(self, name):
         """
-        return cls(
-            element_id=element._element_id,
-            coordinates=(
-                element.metadata.coordinates.points
-                if element.metadata.coordinates
-                else None
-            ),
-            coordinate_system=(
-                element.metadata.coordinates.system
-                if element.metadata.coordinates
-                else None
-            ),
-            metadata=element.metadata,
-            detection_origin=element.metadata.detection_origin,
-        )
+        Delegate attribute access to the wrapped Element instance.
+        """
+        return getattr(self._element, name)
 
     def to_document(
         self,
@@ -51,14 +33,16 @@ class EnhancedElement(Element):
         Returns:
             Document: The converted Document.
         """
+        element = self._element
+
         if deterministic_ids and sequence_number is None:
             raise ValueError(
                 "If deterministic_ids is True, sequence_number must be provided."
             )
 
-        doc_kwargs = {"text": self.text}
+        doc_kwargs = {"text": element.text}
 
-        metadata = self.metadata.to_dict()
+        metadata = element.metadata.to_dict()
 
         if extra_info:
             metadata.update(extra_info)
@@ -70,6 +54,6 @@ class EnhancedElement(Element):
         doc_kwargs["extra_info"] = metadata
 
         if deterministic_ids:
-            doc_kwargs["doc_id"] = self.id_to_hash(sequence_number)
+            doc_kwargs["doc_id"] = element.id_to_hash(sequence_number)
 
         return Document(**doc_kwargs)
