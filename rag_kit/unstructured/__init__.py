@@ -1,3 +1,3 @@
-from rag_kit.unstructured.element import EnhancedElement
+from rag_kit.unstructured.element import ElementComposer
 
-__all__ = ["EnhancedElement"]
+__all__ = ["ElementComposer"]
