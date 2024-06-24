@@ -1,5 +1,5 @@
 import json
-from typing import Optional, Type
+from typing import Optional
 
 from llama_index.core import Document
 from unstructured.documents.elements import Element
@@ -64,7 +64,7 @@ class EnhancedElement(Element):
             metadata.update(extra_info)
 
         for key, value in metadata.items():
-            if not isinstance(value, (str, int, float, Type(None))):
+            if not isinstance(value, (str, int, float, type(None))):
                 metadata[key] = json.dumps(value)
 
         doc_kwargs["extra_info"] = metadata
