@@ -1,4 +1,5 @@
-from typing import Optional
+import json
+from typing import Optional, Type
 
 from llama_index.core import Document
 from unstructured.documents.elements import Element
@@ -58,8 +59,14 @@ class EnhancedElement(Element):
         doc_kwargs = {"text": self.text}
 
         metadata = self.metadata.to_dict()
+
         if extra_info:
             metadata.update(extra_info)
+
+        for key, value in metadata.items():
+            if not isinstance(value, (str, int, float, Type(None))):
+                metadata[key] = json.dumps(value)
+
         doc_kwargs["extra_info"] = metadata
 
         if deterministic_ids:
