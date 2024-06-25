@@ -1,4 +1,5 @@
 import json
+from pydoc import doc
 from typing import Optional
 
 from llama_index.core import Document
@@ -20,6 +21,8 @@ class ElementComposer:
         sequence_number: Optional[int] = None,
         extra_info: Optional[dict] = None,
         deterministic_ids: bool = False,
+        excluded_metadata: Optional[list] = ["orig_elements"],
+        document_kwargs: Optional[dict] = None,
     ) -> Document:
         """
         Convert an Element to a Document.
@@ -40,22 +43,25 @@ class ElementComposer:
                 "If deterministic_ids is True, sequence_number must be provided."
             )
 
-        doc_kwargs = {"text": element.text}
+        if not document_kwargs:
+            kwargs = {"text": element.text}
+        else:
+            kwargs["text"] = element.text
 
         metadata = {}
         if extra_info:
             metadata.update(extra_info)
         for key, value in element.metadata.to_dict():
-            if key in ("orig_elements"):
+            if key in excluded_metadata:
                 continue
             metadata[key] = (
                 value
                 if isinstance(value, (str, int, float, type(None)))
                 else json.dumps(value)
             )
-        doc_kwargs["extra_info"] = metadata
+        kwargs["extra_info"] = metadata
 
         if deterministic_ids:
-            doc_kwargs["doc_id"] = element.id_to_hash(sequence_number)
+            kwargs["doc_id"] = element.id_to_hash(sequence_number)
 
-        return Document(**doc_kwargs)
+        return Document(**kwargs)
