@@ -42,15 +42,17 @@ class ElementComposer:
 
         doc_kwargs = {"text": element.text}
 
-        metadata = element.metadata.to_dict()
-
+        metadata = {}
         if extra_info:
             metadata.update(extra_info)
-
-        for key, value in metadata.items():
-            if not isinstance(value, (str, int, float, type(None))):
-                metadata[key] = json.dumps(value)
-
+        for key, value in element.metadata.to_dict():
+            if key in ("orig_elements"):
+                continue
+            metadata[key] = (
+                value
+                if isinstance(value, (str, int, float, type(None)))
+                else json.dumps(value)
+            )
         doc_kwargs["extra_info"] = metadata
 
         if deterministic_ids:
