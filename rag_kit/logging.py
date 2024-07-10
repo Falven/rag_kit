@@ -7,15 +7,24 @@ from typing import Any, Callable
 def setup_logger(name: str, level=logging.INFO):
     """Sets up a logger with the specified name."""
     logger = logging.getLogger(name)
-    handler = logging.StreamHandler()
+    logger.setLevel(level)
+
+    # Define the desired formatter
     formatter = logging.Formatter(
         fmt="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    logger.setLevel(level)
-    logger = logging.LoggerAdapter(logger)
+
+    # Update existing handlers to ensure they have the desired formatter
+    for handler in logger.handlers:
+        handler.setFormatter(formatter)
+
+    # If no handlers exist, add a new one
+    if not logger.handlers:
+        handler = logging.StreamHandler()
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+
     return logger
 
 
