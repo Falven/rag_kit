@@ -13,6 +13,7 @@ import logging
 from concurrent.futures import Executor, ThreadPoolExecutor
 from graphlib import TopologicalSorter
 from time import sleep, time
+from types import TracebackType
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from pydantic import BaseModel, Field, field_validator
@@ -158,7 +159,7 @@ class TopologicalTaskRunner:
             )
         except BaseException as be:
             self.logger.exception(
-                f"Error executing task {name}\n{be.with_traceback()!s}"
+                f"Error executing task {name}\n{be!s}", stack_info=True
             )
         return result
 
