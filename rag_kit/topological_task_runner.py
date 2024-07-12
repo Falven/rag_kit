@@ -157,7 +157,9 @@ class TopologicalTaskRunner:
                 f"Executed {name} in {elapsed_time:.2f}s ({elapsed_time_ms:.0f}ms)"
             )
         except BaseException as be:
-            self.logger.exception(f"Error executing task {name}: {be}")
+            self.logger.exception(
+                f"Error executing task {name}\n{be.with_traceback()!s}"
+            )
         return result
 
     def _calculate_ready_tasks(
