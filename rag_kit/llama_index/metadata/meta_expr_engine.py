@@ -147,9 +147,13 @@ def _map_condition(condition: str) -> FilterCondition:
 
 
 if __name__ == "__main__":
-    expression = 'tags in ["tag1", "tag2"] and page > 1 or title == "Some title"'
+    expr1 = "page_number lt 3"
+    expr2 = "page_number < 3"
+    expr3 = "page_number == 1,2,3,4"
+    expr4 = "page_number in [1, 2, 3, 4]"
+    expr5 = 'tags in ["tag1", "tag2"] and page > 1 or title == "Some title"'
 
-    filters = parse_expression(expression)
+    filters = parse_expression(expr4)
 
     for metadata_filter in filters:
         print(metadata_filter)

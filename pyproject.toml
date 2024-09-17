@@ -7,7 +7,6 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.13"
-unstructured = "^0.14.6"
 llama-index-core = "^0.10.45"
 
 
